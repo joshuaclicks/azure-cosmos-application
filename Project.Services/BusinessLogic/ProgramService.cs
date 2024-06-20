@@ -15,27 +15,34 @@ namespace Project.Services.BusinessLogic
 
         public async Task<ApiResponse> CreateProgram(ProgramRequest request, CancellationToken cancellationToken = default)
         {
-            var program = await _dbContext.Programs.FirstOrDefaultAsync(x => x.Title.ToLower() == request.Title.ToLower().Trim(), cancellationToken);
-
-            if (program != null)
-                return ResponseHandler.FailureResponse(ErrorCodes.PROGRAM_TYPE_ALREADY_EXIST, ErrorMessages.PROGRAM_TYPE_ALREADY_EXIST);
-
-            var id = Guid.NewGuid().ToString("N");
-            await _dbContext.Programs.AddAsync(new Program
+            try
             {
-                Id = id,
-                Title = request.Title,
-                Description = request.Description,
-                DateCreated = DateTime.UtcNow
-            }, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+                var program = await _dbContext.Programs.FirstOrDefaultAsync(x => x.Title.ToLower() == request.Title.ToLower().Trim(), cancellationToken);
 
-            GenericIdentityResponse response = new()
+                if (program != null)
+                    return ResponseHandler.FailureResponse(ErrorCodes.PROGRAM_TYPE_ALREADY_EXIST, ErrorMessages.PROGRAM_TYPE_ALREADY_EXIST);
+
+                var id = Guid.NewGuid().ToString("N");
+                await _dbContext.Programs.AddAsync(new Program
+                {
+                    Id = id,
+                    Title = request.Title,
+                    Description = request.Description,
+                    DateCreated = DateTime.UtcNow
+                }, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+
+                GenericIdentityResponse response = new()
+                {
+                    Id = id
+                };
+
+                return ResponseHandler.SuccessResponse(SuccessMessages.DEFAULT_SUCCESS_MESSAGE, SuccessCodes.DEFAULT_SUCCESS_CODE, response);
+            }
+            catch
             {
-                Id = id
-            };
-
-            return ResponseHandler.SuccessResponse(SuccessMessages.DEFAULT_SUCCESS_MESSAGE, SuccessCodes.DEFAULT_SUCCESS_CODE, response);
+                return ResponseHandler.FailureResponse(ErrorCodes.DEFAULT_EXCEPTION, ErrorMessages.SERVER_ERROR);
+            }
         }
 
     }

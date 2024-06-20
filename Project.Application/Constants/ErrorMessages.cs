@@ -18,5 +18,7 @@
 
         public const string RESIDENTIAL_COUNTRY_INVALID = "Your residential country is invalid.";
         public const string NATIONALITY_INVALID = "Your nationality is invalid.";
+
+
     }
 }

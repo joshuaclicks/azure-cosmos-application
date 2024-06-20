@@ -3,6 +3,6 @@
     public class ProgramQuestionRequest
     {
         public string ProgramId { get; set; } = null!;
-        public List<QuestionRequest> Questions = [];
+        public List<QuestionRequest> Questions { get; set; } = [];
     }
 }

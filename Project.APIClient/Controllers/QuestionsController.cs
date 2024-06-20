@@ -20,9 +20,19 @@ namespace Project.APIClient.Controllers
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [HttpPost("type")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SwaggerResponse<GenericIdentityResponse>))]
+        public async Task<IActionResult> CreateQuestionType([FromBody] QuestionTypeRequest request, CancellationToken cancellationToken = default) => Response(await _questionService.CreateQuestionType(request, cancellationToken));
+
+        /// <summary>
+        /// Endpoint to create Questions
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SwaggerResponse<>))]
-        public async Task<IActionResult> CreateQuestions([FromBody] ProgramQuestionRequest request, CancellationToken cancellationToken = default) => Response(await _questionService.CreateQuestions(request, cancellationToken));
+        public async Task<IActionResult> CreateQuestions([FromBody]ProgramQuestionRequest request, CancellationToken cancellationToken = default) => Response(await _questionService.CreateQuestions(request, cancellationToken));
 
         /// <summary>
         /// Endpoint to get Questions

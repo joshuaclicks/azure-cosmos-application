@@ -1,8 +1,6 @@
-﻿using Project.DataAccess.Interfaces;
-
-namespace Project.DataAccess.Models
+﻿namespace Project.Application.ViewModels.Responses
 {
-    public class QuestionType : IIdentityCollection
+    public class QuestionTypeResponse
     {
         public string Name { get; set; } = null!;
         public bool IsOptionTyped { get; set; }

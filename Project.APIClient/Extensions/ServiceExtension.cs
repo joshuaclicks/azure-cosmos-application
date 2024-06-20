@@ -10,6 +10,8 @@ using Project.DataAccess.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Azure.Cosmos;
 using System.Net;
+using Project.Application.Contracts;
+using Project.Services.BusinessLogic;
 
 namespace Project.APIClient.Extensions
 {
@@ -24,6 +26,12 @@ namespace Project.APIClient.Extensions
 
         private static IServiceCollection AddSharedInfrastructure(this IServiceCollection services, IConfiguration config)
         {
+            #region Register Application Services
+
+            services.AddScoped<IProgramService, ProgramService>();
+            services.AddScoped<IQuestionService, QuestionService>();
+            services.AddScoped<ICandidateService, CandidateService>();
+            #endregion
 
             services.Configure<DatabaseConfiguration>(options => config.GetSection(nameof(DatabaseConfiguration)));
 

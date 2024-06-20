@@ -5,6 +5,7 @@ using Project.Application.Formatters;
 using Project.Application.ViewModels.Requests;
 using Project.Application.ViewModels.Responses;
 using Project.DataAccess.Contexts;
+using Project.DataAccess.DataObjects;
 using Project.DataAccess.Models;
 
 namespace Project.Services.BusinessLogic
@@ -54,7 +55,7 @@ namespace Project.Services.BusinessLogic
             List<Question> questionList = [];
             for (int index = 0; index < request.Questions.Count; index++)
             {
-                var questionType = questionTypes.FirstOrDefault(x => x.Id != request.Questions[index].QuestionTypeId.Trim());
+                var questionType = questionTypes.FirstOrDefault(x => x.Id == request.Questions[index].QuestionTypeId.Trim());
                 if (questionType == null)
                     return ResponseHandler.FailureResponse(ErrorCodes.QUESTION_TYPES_INVALID, ErrorMessages.QUESTION_TYPES_INVALID);
 
@@ -65,7 +66,15 @@ namespace Project.Services.BusinessLogic
                     MaximumChoiceAllowed = request.Questions[index].MaximumChoiceAllowed,
                     ProgramId = request.ProgramId,
                     Title = request.Questions[index].Title.Trim(),
-                    QuestionType = questionType
+                    QuestionType = new QuestionTypeDto
+                    {
+                        Id = questionType.Id,
+                        IsDateTyped = questionType.IsDateTyped,
+                        IsMultiSelect = questionType.IsMultiSelect,
+                        IsOptionTyped = questionType.IsOptionTyped,
+                        IsTextTyped = questionType.IsTextTyped,
+                        Name = questionType.Name,
+                    }
                 };
 
                 if (request.Questions[index].Options.Count > 0)
@@ -73,7 +82,7 @@ namespace Project.Services.BusinessLogic
                     for (int optionIndex = 0; optionIndex < request.Questions[index].Options.Count; optionIndex++)
                     {
                         var optionId = Guid.NewGuid().ToString("N");
-                        question.Options.Add(new QuestionOption
+                        question.Options.Add(new OptionDto
                         {
                             Id = optionId,
                             Option = request.Questions[index].Options[optionIndex]
@@ -92,28 +101,36 @@ namespace Project.Services.BusinessLogic
 
         public async Task<ApiResponse> GetQuestions(string programId, CancellationToken cancellationToken = default)
         {
-            var questions = await _dbContext.Questions.Where(x => x.ProgramId == programId.Trim()).Select(x => new QuestionResponse
+            var questions = await _dbContext.Questions.Where(x => x.ProgramId == programId.Trim()).ToListAsync(cancellationToken);
+
+            List<QuestionResponse> programQuestions = [];
+            if (questions.Count > 0)
             {
-                Id = x.Id,
-                MaximumChoiceAllowed = x.MaximumChoiceAllowed,
-                QuestionType = new QuestionTypeResponse
+                var questionTypes = await _dbContext.QuestionTypes.ToListAsync(cancellationToken);
+                programQuestions = questions.Select(x => new QuestionResponse
                 {
-                    IsDateTyped = x.QuestionType.IsDateTyped,
-                    IsMultiSelect = x.QuestionType.IsMultiSelect,
-                    IsOptionTyped = x.QuestionType.IsOptionTyped,
-                    IsTextTyped = x.QuestionType.IsTextTyped,
-                    Name = x.QuestionType.Name
-                },
-                Title = x.Title,
-                Options = x.Options.Select(s => new QuestionOptionResponse
-                {
-                    Id = s.Id,
-                    Option = s.Option
-                }).ToList()
-            }).ToListAsync(cancellationToken);
+                    Id = x.Id,
+                    MaximumChoiceAllowed = x.MaximumChoiceAllowed,
+                    QuestionType = x.QuestionType == null ? null : new QuestionTypeResponse
+                    {
+                        IsDateTyped = x.QuestionType.IsDateTyped,
+                        IsMultiSelect = x.QuestionType.IsMultiSelect,
+                        IsOptionTyped = x.QuestionType.IsOptionTyped,
+                        IsTextTyped = x.QuestionType.IsTextTyped,
+                        Name = x.QuestionType.Name, 
+                        Id = x.QuestionType.Id
+                    },
+                    Title = x.Title,
+                    Options = x.Options.Count == 0 ? [] : x.Options.Select(s => new QuestionOptionResponse
+                    {
+                        Id = s.Id,
+                        Option = s.Option
+                    }).ToList()
+                }).ToList();
+            }
 
 
-            return ResponseHandler.SuccessResponse(SuccessMessages.DEFAULT_SUCCESS_MESSAGE, SuccessCodes.DEFAULT_SUCCESS_CODE, questions);
+            return ResponseHandler.SuccessResponse(SuccessMessages.DEFAULT_SUCCESS_MESSAGE, SuccessCodes.DEFAULT_SUCCESS_CODE, programQuestions);
         }
 
         public async Task<ApiResponse> UpdateQuestions(List<UpdateQuestionRequest> request, CancellationToken cancellationToken = default)
@@ -148,7 +165,15 @@ namespace Project.Services.BusinessLogic
 
                 if (!string.IsNullOrWhiteSpace(request[index].QuestionTypeId))
                 {
-                    question.QuestionType = questionType;
+                    question.QuestionType = new QuestionTypeDto
+                    {
+                        Name = questionType.Name,
+                        IsTextTyped = questionType.IsTextTyped,
+                        IsOptionTyped = questionType.IsOptionTyped,
+                        IsMultiSelect = questionType.IsMultiSelect,
+                        IsDateTyped = questionType.IsDateTyped,
+                        Id = questionType.Id
+                    };
                 }
 
                 if (request[index].Options.Count > 0)
@@ -157,7 +182,7 @@ namespace Project.Services.BusinessLogic
                     for (int optionIndex = 0; optionIndex < request[index].Options.Count; optionIndex++)
                     {
                         var optionId = Guid.NewGuid().ToString("N");
-                        question.Options.Add(new QuestionOption
+                        question.Options.Add(new OptionDto
                         {
                             Id = optionId,
                             Option = request[index].Options[optionIndex]

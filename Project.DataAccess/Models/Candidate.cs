@@ -12,10 +12,8 @@ namespace Project.DataAccess.Models
         public string PhoneNumber { get; set; } = null!;
         public string PhoneCode { get; set; } = null!;
 
-        [NotMapped]
         public CountryDto Nationality { get; set; } = null!;
 
-        [NotMapped]
         public CountryDto CountryOfResidence { get; set; } = null!;
         public string CandidateId { get; set; } = null!;
         public DateOnly DateOfBirth { get; set; }

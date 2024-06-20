@@ -15,7 +15,7 @@ namespace Project.APIClient.Controllers
         private readonly IQuestionService _questionService = questionService;
 
         /// <summary>
-        /// Endpoint to create Questions
+        /// Endpoint to create Question Types
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>

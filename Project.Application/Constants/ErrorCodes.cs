@@ -11,5 +11,7 @@
         public const string RESPONSE_QUESTIONS_INVALID = "Error-A-07";
         public const string NATIONALITY_INVALID = "Error-A-08";
         public const string RESIDENTIAL_COUNTRY_INVALID = "Error-A-09";
+
+        public const string DEFAULT_EXCEPTION = "Error-00";
     }
 }

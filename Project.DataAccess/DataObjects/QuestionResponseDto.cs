@@ -1,10 +1,5 @@
 ﻿using Project.DataAccess.Models;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project.DataAccess.DataObjects
 {
@@ -14,6 +9,6 @@ namespace Project.DataAccess.DataObjects
 
         [NotMapped]
         public ICollection<QuestionOption> SelectedOptions { get; set; } = [];
-        public string QuestionText { get; set; } = null!;
+        public string AnswerText { get; set; } = null!;
     }
 }

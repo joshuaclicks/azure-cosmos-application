@@ -10,4 +10,9 @@
     <Folder Include="BusinessLogic\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Project.Application\Project.Application.csproj" />
+    <ProjectReference Include="..\Project.DataAccess\Project.DataAccess.csproj" />
+  </ItemGroup>
+
 </Project>

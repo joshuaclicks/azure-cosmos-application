@@ -6,6 +6,10 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using NLog.Extensions.Logging;
 using Project.Application.Configurations;
+using Project.DataAccess.Contexts;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Azure.Cosmos;
+using System.Net;
 
 namespace Project.APIClient.Extensions
 {
@@ -61,6 +65,15 @@ namespace Project.APIClient.Extensions
                 });
 
             });
+
+            services.AddDbContext<EmployerApplicationContext>(options =>
+                    options.UseCosmos(config["DatabaseConfiguration:Endpoint"], config["DatabaseConfiguration:AccountKey"], config["DatabaseConfiguration:DatabaseName"], options =>
+                    {
+                        options.ConnectionMode(ConnectionMode.Direct);
+                        options.WebProxy(new WebProxy());
+                        options.LimitToEndpoint();
+                        options.RequestTimeout(TimeSpan.FromSeconds(Convert.ToInt32(config["DatabaseConfiguration:RequestTimeoutInSeconds"])));
+                    }));
 
 
             services.AddAntiforgery();
